@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Rotativo - Olimpiadas Vonex 2026</title>
-    <!-- Tailwind CSS para diseño moderno -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js para gráficos avanzados -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Google Fonts - Plus Jakarta Sans -->
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { 
@@ -20,15 +20,28 @@
             border: 1px solid rgba(255, 255, 255, 0.04);
             backdrop-filter: blur(16px);
         }
+        .nav-card {
+            transition: all 0.3s ease;
+        }
+        .nav-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(99, 102, 241, 0.4);
+            box-shadow: 0 10px 20px -10px rgba(99, 102, 241, 0.3);
+        }
         .fade-transition {
             transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+        /* Margen superior para que el menú pegajoso no tape los títulos al hacer clic */
+        .scroll-mt-24 {
+            scroll-margin-top: 6rem;
         }
     </style>
 </head>
 <body class="text-slate-100 min-h-screen antialiased">
 
-    <!-- Encabezado -->
-    <header class="border-b border-slate-800/80 bg-slate-950/40 backdrop-blur-xl sticky top-0 z-50">
+    <!-- Encabezado Pegajoso -->
+    <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3.5">
                 <div class="bg-gradient-to-tr from-indigo-600 to-violet-500 p-2.5 rounded-xl text-white font-extrabold text-xl tracking-wider shadow-lg shadow-indigo-500/20">V</div>
@@ -42,100 +55,118 @@
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_10px_#10b981]"></span>
                 </span>
-                <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 tracking-wider uppercase">Conectado en Vivo</span>
+                <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 tracking-wider uppercase hidden sm:inline-block">Conectado en Vivo</span>
             </div>
         </div>
     </header>
 
-    <!-- Alerta de Sincronización -->
-    <div id="error-box" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-        <div class="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-4 rounded-xl text-sm font-medium">
-            ⚠️ Alerta de Sincronización: No se pueden leer los datos. Asegúrate de publicar la pestaña DATOS_WEB como CSV.
-        </div>
-    </div>
-
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
-        <!-- Tarjetas de Resumen Dinámicas -->
-        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="premium-card rounded-2xl p-6 flex flex-col justify-between shadow-xl relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-indigo-500 to-violet-500"></div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Avance General</p>
-                <h3 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400 mt-2" id="txt-avance-global">...</h3>
-                <div class="w-full bg-slate-800 rounded-full h-2 mt-5 overflow-hidden">
-                    <div id="bar-avance-global" class="bg-gradient-to-r from-indigo-500 to-violet-500 h-full rounded-full transition-all duration-700" style="width: 0%"></div>
-                </div>
-            </div>
-            <div class="premium-card rounded-2xl p-6 shadow-xl relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald-500 to-teal-500"></div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Recaudado</p>
-                <h3 class="text-3xl font-extrabold text-emerald-400 mt-2" id="txt-recaudado-global">...</h3>
-                <p class="text-xs text-slate-500 font-semibold mt-2.5 border-t border-slate-800/60 pt-2" id="txt-meta-global">Meta Total: ...</p>
-            </div>
-            <div class="premium-card rounded-2xl p-6 shadow-xl relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-sky-500 to-blue-500"></div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Estudiantes Pagantes</p>
-                <h3 class="text-3xl font-extrabold text-sky-400 mt-2" id="txt-pagantes-global">...</h3>
-                <p class="text-xs text-slate-500 font-semibold mt-2.5 border-t border-slate-800/60 pt-2" id="txt-meta-alumnos">Meta Alumnos: ...</p>
-            </div>
-            <div class="premium-card rounded-2xl p-6 shadow-xl relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-rose-500 to-red-500"></div>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Monto Pendiente (Falta)</p>
-                <h3 class="text-3xl font-extrabold text-rose-400 mt-2" id="txt-falta-global">...</h3>
-                <p class="text-xs text-slate-500 font-semibold mt-2.5 border-t border-slate-800/60 pt-2">Por recaudar</p>
-            </div>
-        </section>
+        <!-- MENÚ DE NAVEGACIÓN INTERACTIVO -->
+        <nav class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <a href="#resumen" class="premium-card nav-card rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer group">
+                <span class="text-3xl mb-2 group-hover:scale-110 transition-transform">📊</span>
+                <span class="text-sm font-bold text-slate-300 group-hover:text-white tracking-wide">Resumen</span>
+            </a>
+            <a href="#clasificacion" class="premium-card nav-card rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer group">
+                <span class="text-3xl mb-2 group-hover:scale-110 transition-transform">🏆</span>
+                <span class="text-sm font-bold text-slate-300 group-hover:text-white tracking-wide">Clasificación</span>
+            </a>
+            <a href="#pagos" class="premium-card nav-card rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer group">
+                <span class="text-3xl mb-2 group-hover:scale-110 transition-transform">💰</span>
+                <span class="text-sm font-bold text-slate-300 group-hover:text-white tracking-wide">Pagos</span>
+            </a>
+            <a href="#tutores" class="premium-card nav-card rounded-2xl p-4 flex flex-col items-center justify-center cursor-pointer group">
+                <span class="text-3xl mb-2 group-hover:scale-110 transition-transform">👩‍🏫</span>
+                <span class="text-sm font-bold text-slate-300 group-hover:text-white tracking-wide">Tutores</span>
+            </a>
+        </nav>
 
-        <!-- SECCIÓN COMPONENTE ROTATIVO "UNO POR UNO" -->
-        <section class="premium-card rounded-2xl p-6 shadow-2xl bg-gradient-to-b from-slate-950/40 to-transparent relative overflow-hidden">
-            <div class="absolute top-3 right-5 flex items-center space-x-1.5">
-                <span class="h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
-                <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Rotación Activa</span>
-            </div>
-            <h3 class="text-base font-bold text-white mb-5 flex items-center gap-2 tracking-tight">
-                <span>🔄 Monitoreo Individual en Tiempo Real</span>
-            </h3>
-            
-            <!-- Contenedor del Carrusel Animado -->
-            <div id="rotation-card" class="fade-transition opacity-100 transform scale-100 grid grid-cols-1 md:grid-cols-3 gap-6 items-center min-h-[140px]">
-                <div class="md:col-span-1 space-y-2">
-                    <span id="rot-ciclo" class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md tracking-wider">...</span>
-                    <h2 id="rot-tutor" class="text-xl font-extrabold text-white tracking-tight mt-2">Cargando Tutor...</h2>
-                </div>
-                <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center md:border-l border-slate-800/80 md:pl-6">
-                    <div class="bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Meta Dinero</p>
-                        <p id="rot-meta" class="text-sm font-extrabold text-slate-200 mt-1">...</p>
-                    </div>
-                    <div class="bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Efectivo</p>
-                        <p id="rot-efectivo" class="text-sm font-extrabold text-slate-300 mt-1">...</p>
-                    </div>
-                    <div class="bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Yape</p>
-                        <p id="rot-yape" class="text-sm font-extrabold text-slate-300 mt-1">...</p>
-                    </div>
-                    <div class="bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avance</p>
-                        <p id="rot-avance" class="text-sm font-black text-emerald-400 mt-1">...</p>
+        <!-- SECCIÓN: RESUMEN -->
+        <div id="resumen" class="space-y-8 scroll-mt-24">
+            <!-- Tarjetas de KPIs -->
+            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="premium-card rounded-2xl p-6 flex flex-col justify-between shadow-xl relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-indigo-500 to-violet-500"></div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Avance General</p>
+                    <h3 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-violet-400 mt-2" id="txt-avance-global">...</h3>
+                    <div class="w-full bg-slate-800 rounded-full h-2 mt-5 overflow-hidden">
+                        <div id="bar-avance-global" class="bg-gradient-to-r from-indigo-500 to-violet-500 h-full rounded-full transition-all duration-700" style="width: 0%"></div>
                     </div>
                 </div>
-            </div>
-        </section>
+                <div class="premium-card rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Recaudado</p>
+                    <h3 class="text-3xl font-extrabold text-emerald-400 mt-2" id="txt-recaudado-global">...</h3>
+                    <p class="text-xs text-slate-500 font-semibold mt-2.5 border-t border-slate-800/60 pt-2" id="txt-meta-global">Meta Total: ...</p>
+                </div>
+                <div class="premium-card rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-sky-500 to-blue-500"></div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Estudiantes Pagantes</p>
+                    <h3 class="text-3xl font-extrabold text-sky-400 mt-2" id="txt-pagantes-global">...</h3>
+                    <p class="text-xs text-slate-500 font-semibold mt-2.5 border-t border-slate-800/60 pt-2" id="txt-meta-alumnos">Meta Alumnos: ...</p>
+                </div>
+                <div class="premium-card rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-rose-500 to-red-500"></div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Monto Pendiente (Falta)</p>
+                    <h3 class="text-3xl font-extrabold text-rose-400 mt-2" id="txt-falta-global">...</h3>
+                    <p class="text-xs text-slate-500 font-semibold mt-2.5 border-t border-slate-800/60 pt-2">Por recaudar</p>
+                </div>
+            </section>
 
-        <!-- Gráfico y Tabla -->
+            <!-- Carrusel Rotativo -->
+            <section class="premium-card rounded-2xl p-6 shadow-2xl bg-gradient-to-b from-slate-950/40 to-transparent relative overflow-hidden">
+                <div class="absolute top-3 right-5 flex items-center space-x-1.5">
+                    <span class="h-2 w-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                    <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Rotación Activa</span>
+                </div>
+                <h3 class="text-base font-bold text-white mb-5 flex items-center gap-2 tracking-tight">
+                    <span>🔄 Monitoreo Individual en Tiempo Real</span>
+                </h3>
+                
+                <div id="rotation-card" class="fade-transition opacity-100 transform scale-100 grid grid-cols-1 md:grid-cols-3 gap-6 items-center min-h-[140px]">
+                    <div class="md:col-span-1 space-y-2">
+                        <span id="rot-ciclo" class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md tracking-wider">...</span>
+                        <h2 id="rot-tutor" class="text-xl font-extrabold text-white tracking-tight mt-2">Cargando Tutor...</h2>
+                    </div>
+                    <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center md:border-l border-slate-800/80 md:pl-6">
+                        <div class="bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Meta Dinero</p>
+                            <p id="rot-meta" class="text-sm font-extrabold text-slate-200 mt-1">...</p>
+                        </div>
+                        <div class="bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Efectivo</p>
+                            <p id="rot-efectivo" class="text-sm font-extrabold text-slate-300 mt-1">...</p>
+                        </div>
+                        <div class="bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Yape</p>
+                            <p id="rot-yape" class="text-sm font-extrabold text-slate-300 mt-1">...</p>
+                        </div>
+                        <div class="bg-slate-900/30 p-3 rounded-xl border border-slate-800/40">
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Avance</p>
+                            <p id="rot-avance" class="text-sm font-black text-emerald-400 mt-1">...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Gráfico, Tabla y Ranking -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="lg:col-span-2 space-y-8">
-                <section class="premium-card rounded-2xl p-6 shadow-xl">
+                
+                <!-- SECCIÓN: PAGOS (Gráfico) -->
+                <section id="pagos" class="premium-card rounded-2xl p-6 shadow-xl scroll-mt-24">
                     <h3 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        📊 Comparativa de Recaudación (S/)
+                        💰 Comparativa de Recaudación (S/)
                     </h3>
                     <div class="relative h-80"><canvas id="chartTutors"></canvas></div>
                 </section>
 
-                <section class="premium-card rounded-2xl overflow-hidden shadow-2xl">
+                <!-- SECCIÓN: TUTORES (Tabla) -->
+                <section id="tutores" class="premium-card rounded-2xl overflow-hidden shadow-2xl scroll-mt-24">
                     <div class="p-5 border-b border-slate-800/80 bg-slate-950/20">
-                        <h3 class="text-base font-bold text-white tracking-tight">Detalle por Tutor</h3>
+                        <h3 class="text-base font-bold text-white tracking-tight">👩‍🏫 Detalle por Tutor</h3>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
@@ -158,9 +189,9 @@
                 </section>
             </div>
 
-            <!-- Ranking -->
+            <!-- SECCIÓN: CLASIFICACIÓN (Ranking) -->
             <div class="lg:col-span-1 space-y-8">
-                <section class="premium-card rounded-2xl p-6 shadow-xl flex flex-col h-full">
+                <section id="clasificacion" class="premium-card rounded-2xl p-6 shadow-xl flex flex-col h-full scroll-mt-24">
                     <div class="mb-5 border-b border-slate-800/80 pb-4">
                         <h3 class="text-base font-bold text-white flex items-center gap-2 tracking-tight">
                             🏆 Tabla de Posiciones
@@ -234,7 +265,6 @@
                     
                     document.getElementById('txt-avance-global').innerText = avanceGlobalNum + '%';
                     document.getElementById('bar-avance-global').style.width = avanceGlobalNum + '%';
-                    document.getElementById('error-box').className = 'hidden';
                 }
 
                 tutorsGlobalArray = [];
@@ -276,24 +306,19 @@
 
             } catch (error) {
                 console.error(error);
-                document.getElementById('error-box').className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 block';
             }
         }
 
-        // FUNCIÓN ENCARGADA DE HACER PASAR UNO POR UNO A LOS TUTORES
         function rotateTutorOneByOne() {
             if (tutorsGlobalArray.length === 0) return;
             
             const cardEl = document.getElementById('rotation-card');
-            
-            // Efecto de desvanecimiento de salida (Fade out)
             cardEl.style.opacity = 0;
             cardEl.style.transform = 'scale(0.98)';
             
             setTimeout(() => {
                 const currentTutor = tutorsGlobalArray[currentRotateIndex];
                 
-                // Cargar datos del tutor seleccionado en turno
                 document.getElementById('rot-ciclo').innerText = currentTutor.ciclo;
                 document.getElementById('rot-tutor').innerText = currentTutor.tutor;
                 document.getElementById('rot-meta').innerText = `S/ ${currentTutor.metaDinero.toLocaleString('es-PE')}`;
@@ -301,11 +326,9 @@
                 document.getElementById('rot-yape').innerText = `S/ ${currentTutor.yape.toLocaleString('es-PE')}`;
                 document.getElementById('rot-avance').innerText = `${currentTutor.avance}%`;
                 
-                // Efecto de entrada (Fade in)
                 cardEl.style.opacity = 1;
                 cardEl.style.transform = 'scale(1)';
                 
-                // Avanzar al siguiente tutor de la lista
                 currentRotateIndex = (currentRotateIndex + 1) % tutorsGlobalArray.length;
             }, 500);
         }
@@ -399,14 +422,11 @@
             });
         }
 
-        // Carga inicial de datos de la base de datos
         loadDashboardData().then(() => {
-            // Ejecutar la rotación cada 4 segundos
             setInterval(rotateTutorOneByOne, 4000);
-            setTimeout(rotateTutorOneByOne, 800); // Primera ejecución rápida
+            setTimeout(rotateTutorOneByOne, 800);
         });
         
-        // Recargar datos desde la hoja cada minuto
         setInterval(loadDashboardData, 60000);
     </script>
 </body>

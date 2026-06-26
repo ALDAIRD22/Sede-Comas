@@ -16,9 +16,9 @@
             background: radial-gradient(circle at top right, #1e1b4b 0%, #0f172a 60%, #020617 100%);
         }
         .premium-card {
-            background: rgba(15, 23, 42, 0.45);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(16px);
+            background: rgba(22, 30, 49, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
         }
         .nav-card {
             transition: all 0.25s ease;
@@ -31,18 +31,18 @@
     <header class="border-b border-slate-800 bg-slate-950/40 backdrop-blur-xl sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3.5">
-                <div class="bg-indigo-600 p-2.5 rounded-xl text-white font-extrabold text-xl tracking-wider">V</div>
+                <div class="bg-indigo-600 p-2 rounded-lg text-white font-bold text-xl tracking-wider">V</div>
                 <div>
                     <h1 class="text-lg font-bold text-white tracking-tight">OLIMPIADAS VONEX 2026</h1>
                     <p class="text-xs text-slate-400">Control de pagos automatizado</p>
                 </div>
             </div>
             <div class="flex items-center space-x-2.5">
-                <span class="flex h-2.5 w-2.5 relative">
+                <span class="flex h-2 w-2 relative">
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_10px_#10b981]"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 uppercase tracking-wider">Conectado en Vivo</span>
+                <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 uppercase tracking-wider">Conectado en Vivo</span>
             </div>
         </div>
     </header>
@@ -50,13 +50,13 @@
     <!-- Alerta de Sincronización -->
     <div id="error-box" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         <div class="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-4 rounded-xl text-sm font-medium">
-            ⚠️ Alerta de Sincronización: No se pueden leer los datos. Verifica que la hoja esté compartida como "Cualquier persona con el enlace".
+            ⚠️ Alerta de Sincronización: No se pueden leer los datos. Asegúrate de verificar los permisos en tu Google Sheets.
         </div>
     </div>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
-        <!-- MENÚ DE NAVEGACIÓN -->
+        <!-- MENÚ DE NAVEGACIÓN POR TARJETAS -->
         <nav class="grid grid-cols-2 lg:grid-cols-4 gap-5">
             <button onclick="switchTab('view-resumen')" id="btn-view-resumen" class="nav-card premium-card text-left rounded-2xl p-5 border-indigo-500/40 bg-indigo-500/5 ring-1 ring-indigo-500/20 shadow-lg shadow-indigo-500/5">
                 <div class="text-3xl">📊</div>
@@ -80,9 +80,9 @@
             </button>
         </nav>
 
-        <!-- INDICADORES SUPERIORES -->
+        <!-- TARJETAS DE INDICADORES GLOBALES -->
         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div class="premium-card rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+            <div class="premium-card rounded-2xl p-5 flex flex-col justify-between shadow-xl relative overflow-hidden">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">💰 Total recaudado</p>
                 <h3 class="text-3xl font-extrabold text-emerald-400 mt-2 tracking-tight" id="txt-recaudado-global">...</h3>
             </div>
@@ -125,7 +125,7 @@
         <div id="view-clasificacion" class="tab-view hidden space-y-6">
             <div class="premium-card rounded-2xl p-6 shadow-xl max-w-2xl mx-auto">
                 <div class="mb-5 border-b border-slate-800/80 pb-3">
-                    <h3 class="text-lg font-bold text-white tracking-tight flex items-center gap-2">🏆 Ranking de tutores</h3>
+                    <h3 class="text-lg font-bold text-white tracking-tight">🏆 Ranking de tutores</h3>
                 </div>
                 <div class="space-y-4" id="leaderboard-container"></div>
             </div>
@@ -171,24 +171,25 @@
             </div>
         </div>
 
-        <!-- VISTA 4: GRILLA COMPACTA DE TUTORES CON COLORES -->
+        <!-- VISTA 4: TABLA DE TUTORES CON ENCABEZADO OSCURO SÓLIDO -->
         <div id="view-tutores" class="tab-view hidden space-y-6">
             <section class="premium-card rounded-2xl overflow-hidden shadow-2xl">
                 <div class="p-5 border-b border-slate-800/80 bg-slate-950/20">
                     <h3 class="text-base font-bold text-white tracking-tight">Detalle por Tutor</h3>
                 </div>
-                <div class="w-full overflow-x-auto lg:overflow-x-hidden"> <!-- Ajuste de protección -->
+                <div class="w-full overflow-x-auto lg:overflow-x-hidden">
                     <table class="w-full text-left border-collapse text-[11px] sm:text-xs">
                         <thead>
-                            <tr class="bg-slate-950/50 text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800 text-[10px]">
+                            <!-- MODIFICADO: bg-slate-950 SÓLIDO Y OSCURO PARA EL CUADRADO DEL ENCABEZADO -->
+                            <tr class="bg-slate-950 text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800 text-[10px]">
                                 <th class="py-3.5 px-3">Tutor</th>
                                 <th class="py-3.5 px-2">Ciclo</th>
                                 <th class="py-3.5 px-2 text-center">Matr.</th>
-                                <th class="py-3.5 px-2 text-center text-orange-400/90">Meta</th>
-                                <th class="py-3.5 px-2 text-center text-sky-400/90">Pag.</th>
-                                <th class="py-3.5 px-2 text-right text-amber-400/90">Meta (S/)</th>
-                                <th class="py-3.5 px-2 text-right text-teal-400/90">Efectivo</th>
-                                <th class="py-3.5 px-2 text-right text-violet-400/90">Yape</th>
+                                <th class="py-3.5 px-2 text-center text-orange-400">Meta</th>
+                                <th class="py-3.5 px-2 text-center text-sky-400">Pag.</th>
+                                <th class="py-3.5 px-2 text-right text-amber-400">Meta (S/)</th>
+                                <th class="py-3.5 px-2 text-right text-teal-400">Efectivo</th>
+                                <th class="py-3.5 px-2 text-right text-violet-400">Yape</th>
                                 <th class="py-3.5 px-2 text-right text-emerald-400">Total</th>
                                 <th class="py-3.5 px-2 text-right text-rose-400">Falta</th>
                                 <th class="py-3.5 px-3 text-center">Avance</th>
@@ -262,18 +263,7 @@
                     
                     document.getElementById('txt-avance-global').innerText = avanceGlobalNum + '%';
                     document.getElementById('bar-avance-global').style.width = avanceGlobalNum + '%';
-
-                    document.getElementById('box-efectivo-total').innerText = `S/ ${efGlobal.toLocaleString('es-PE', {minimumFractionDigits:0})}`;
-                    document.getElementById('box-yape-total').innerText = `S/ ${yGlobal.toLocaleString('es-PE', {minimumFractionDigits:0})}`;
-                    document.getElementById('box-recaudado-total').innerText = `S/ ${getVal(tRow.c[8], true).toLocaleString('es-PE', {minimumFractionDigits:0})}`;
-
-                    let mAlumnos = getVal(tRow.c[3], true);
-                    let pActuales = getVal(tRow.c[4], true);
-                    document.getElementById('box-meta-alumnos').innerText = mAlumnos;
-                    document.getElementById('box-pagantes-actuales').innerText = pActuales;
-                    document.getElementById('box-pagantes-falta').innerText = (mAlumnos - Math.floor(pActuales));
-
-                    document.getElementById('error-box').classList.add('hidden');
+                    document.getElementById('error-box').className = 'hidden';
                 }
 
                 const tutorsData = [];
@@ -291,27 +281,26 @@
                     tutorsData.push({
                         tutor: tutorName,
                         ciclo: getVal(row.c[1]).trim(),
-                        matriculados: getVal(row.c[2], true),
-                        metaEst: getVal(row.c[3], true),
-                        pagantes: getVal(row.c[4], true),
-                        metaDinero: getVal(row.c[5], true),
-                        efectivo: getVal(row.c[6], true),
-                        yape: getVal(row.c[7], true),
-                        recaudado: getVal(row.c[8], true),
-                        falta: getVal(row.c[9], true),
+                        metaEst: getVal(row.c[2], true),
+                        pagantes: getVal(row.c[3], true),
+                        metaDinero: getVal(row.c[4], true),
+                        efectivo: getVal(row.c[5], true),
+                        yape: getVal(row.c[6], true),
+                        recaudado: getVal(row.c[7], true),
+                        falta: getVal(row.c[8], true),
                         avance: avanceNum
                     });
                 }
 
                 renderTable(tutorsData);
-                renderCharts(tutorsData, efGlobal, yGlobal);
+                renderChart(tutorsData);
                 
                 const rankedData = [...tutorsData].sort((a, b) => b.avance - a.avance);
                 renderLeaderboard(rankedData);
 
             } catch (error) {
                 console.error(error);
-                document.getElementById('error-box').classList.remove('hidden');
+                document.getElementById('error-box').className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 block';
             }
         }
 

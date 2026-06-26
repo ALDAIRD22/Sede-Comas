@@ -29,6 +29,28 @@
 </head>
 <body class="text-slate-100 min-h-screen antialiased">
 
+    <!-- PANTALLA DE BIENVENIDA (SPLASH SCREEN) -->
+    <div id="welcome-overlay" class="fixed inset-0 z-[100] bg-slate-950/90 backdrop-blur-2xl flex items-center justify-center transition-opacity duration-700 opacity-100">
+        <div class="text-center space-y-6 transform transition-all scale-100 animate-pulse" id="welcome-content">
+            <div class="inline-flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 shadow-[0_0_40px_rgba(99,102,241,0.4)] mb-2">
+                <span class="text-5xl text-white font-black">V</span>
+            </div>
+            <h2 class="text-3xl font-extrabold text-white tracking-tight">Olimpiadas Vonex 2026</h2>
+            
+            <div class="flex flex-col items-center justify-center space-y-3 mt-6">
+                <p id="welcome-loading" class="text-slate-400 font-medium tracking-widest uppercase text-sm">Calculando datos en vivo...</p>
+                
+                <!-- Aquí se inyectan los porcentajes mágicamente -->
+                <div id="welcome-stats" class="hidden flex-col items-center space-y-2 mt-2">
+                    <p class="text-6xl font-black text-emerald-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.3)]" id="welcome-avance">...%</p>
+                    <div class="bg-rose-500/10 border border-rose-500/20 px-4 py-1.5 rounded-full mt-2">
+                        <p class="text-sm font-bold text-rose-400 tracking-wide" id="welcome-falta">Falta ...%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Encabezado -->
     <header class="border-b border-slate-800 bg-slate-950/40 backdrop-blur-xl sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -215,6 +237,7 @@
         let chartBar = null;
         let chartPie = null;
         let chartStudents = null;
+        let isFirstLoad = true; // Control de la pantalla de bienvenida
 
         function switchTab(targetId) {
             document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
@@ -256,6 +279,7 @@
 
                 const tRow = rows[totalsIndex + 1] || rows[totalsIndex];
                 let efGlobal = 0, yGlobal = 0, matrGlobal = 0, metaAlGlobal = 0, pagGlobal = 0;
+                let avanceGlobalNum = 0;
 
                 if(tRow && tRow.c) {
                     matrGlobal = getVal(tRow.c[2], true);
@@ -269,8 +293,12 @@
                     document.getElementById('txt-falta-global').innerText = `S/ ${getVal(tRow.c[9], true).toLocaleString('es-PE')}`;
                     
                     let avanceStr = getVal(tRow.c[10]);
-                    let avanceGlobalNum = avanceStr.includes('%') ? parseInt(avanceStr) : Math.round(getVal(tRow.c[10], true) * 100);
-                    if (avanceStr && !avanceStr.includes('%') && getVal(tRow.c[10], true) <= 1.5) avanceGlobalNum = Math.round(getVal(tRow.c[10], true) * 100);
+                    if (avanceStr.includes('%')) {
+                        avanceGlobalNum = parseInt(avanceStr);
+                    } else {
+                        let numA = getVal(tRow.c[10], true);
+                        avanceGlobalNum = numA <= 1.5 ? Math.round(numA * 100) : Math.round(numA);
+                    }
                     
                     document.getElementById('txt-avance-global').innerText = avanceGlobalNum + '%';
                     document.getElementById('bar-avance-global').style.width = avanceGlobalNum + '%';
@@ -284,6 +312,28 @@
                     document.getElementById('box-pagantes-falta').innerText = (metaAlGlobal - Math.floor(pagGlobal));
 
                     document.getElementById('error-box').className = 'hidden';
+                }
+
+                // GESTIÓN DE LA PANTALLA DE BIENVENIDA (SPLASH SCREEN)
+                if (isFirstLoad) {
+                    document.getElementById('welcome-avance').innerText = avanceGlobalNum + '% Avance';
+                    let faltaProgreso = 100 - avanceGlobalNum;
+                    if (faltaProgreso < 0) faltaProgreso = 0;
+                    document.getElementById('welcome-falta').innerText = `Falta ${faltaProgreso}% para la meta`;
+                    
+                    document.getElementById('welcome-loading').classList.add('hidden');
+                    document.getElementById('welcome-stats').classList.remove('hidden');
+                    document.getElementById('welcome-stats').classList.add('flex');
+                    document.getElementById('welcome-content').classList.remove('animate-pulse');
+                    
+                    setTimeout(() => {
+                        const overlay = document.getElementById('welcome-overlay');
+                        overlay.classList.remove('opacity-100');
+                        overlay.classList.add('opacity-0');
+                        setTimeout(() => overlay.remove(), 700);
+                    }, 3500);
+                    
+                    isFirstLoad = false;
                 }
 
                 const tutorsData = [];
@@ -322,6 +372,10 @@
             } catch (error) {
                 console.error(error);
                 document.getElementById('error-box').className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 block';
+                
+                // Ocultar pantalla de bienvenida en caso de error
+                const overlay = document.getElementById('welcome-overlay');
+                if (overlay) overlay.remove();
             }
         }
 
@@ -398,7 +452,6 @@
                     datasets: [
                         { label: 'Meta Asignada (S/)', data: data.map(r => r.metaDinero), backgroundColor: 'rgba(71, 85, 105, 0.4)', borderRadius: 4 },
                         { label: 'Total Recaudado (S/)', data: data.map(r => r.recaudado), backgroundColor: 'rgba(16, 185, 129, 0.85)', borderRadius: 4 },
-                        // NUEVO DATASET: "CUANTO FALTA" EN COLOR ROJO VIBRANTE
                         { label: 'Falta Recaudar (S/)', data: data.map(r => r.falta > 0 ? r.falta : 0), backgroundColor: 'rgba(239, 68, 68, 0.85)', borderRadius: 4 }
                     ]
                 },

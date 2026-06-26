@@ -8,18 +8,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Librería para mostrar números sobre las barras -->
+    <!-- Librería para mostrar números sobre las barras de Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: radial-gradient(circle at top right, #0a183d 0%, #050a1a 60%, #010307 100%);
+            background: radial-gradient(circle at top right, #13113c 0%, #090d1f 60%, #02040a 100%);
         }
         .premium-card {
             background: rgba(10, 16, 32, 0.95);
-            border: 1px solid rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.02);
             backdrop-filter: blur(20px);
         }
         .nav-card {
@@ -69,7 +69,7 @@
     <header class="border-b border-slate-800 bg-slate-950/60 backdrop-blur-xl sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3.5">
-                <div class="bg-gradient-to-r from-blue-600 to-cyan-500 p-2.5 rounded-xl text-white font-extrabold text-xl tracking-wider">V</div>
+                <div class="bg-indigo-600 p-2.5 rounded-xl text-white font-extrabold text-xl tracking-wider">V</div>
                 <div>
                     <h1 class="text-lg font-bold text-white tracking-tight">OLIMPIADAS VONEX 2026</h1>
                     <p class="text-xs text-slate-400">Control de pagos automatizado</p>
@@ -77,15 +77,15 @@
             </div>
             <div class="flex items-center space-x-2.5">
                 <span class="flex h-2 w-2 relative">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span class="text-xs font-bold text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-full border border-cyan-500/20 uppercase tracking-wider">Conectado en Vivo</span>
+                <span class="text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 uppercase tracking-wider">Conectado en Vivo</span>
             </div>
         </div>
     </header>
 
-    <!-- Alerta de Sincronización -->
+    <!-- Alerta de Sincronización Literaria -->
     <div id="error-box" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
         <div class="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-4 rounded-xl text-sm font-medium">
             ⚠️ Alerta de Sincronización: No se pueden leer los datos. Verifica que la hoja esté compartida como "Cualquier persona con el enlace".
@@ -96,7 +96,7 @@
         
         <!-- MENÚ DE NAVEGACIÓN POR TARJETAS -->
         <nav class="grid grid-cols-2 lg:grid-cols-4 gap-5">
-            <button onclick="switchTab('view-resumen')" id="btn-view-resumen" class="nav-card premium-card text-left rounded-2xl p-5 border-cyan-500/40 bg-cyan-950/40 ring-1 ring-cyan-500/20 shadow-lg shadow-cyan-500/5">
+            <button onclick="switchTab('view-resumen')" id="btn-view-resumen" class="nav-card premium-card text-left rounded-2xl p-5 border-cyan-500/40 bg-cyan-950/90 ring-1 ring-cyan-500/20 shadow-lg shadow-cyan-500/5">
                 <div class="text-3xl">📊</div>
                 <div class="text-sm font-bold text-white mt-3">Resumen</div>
                 <div class="text-[11px] text-cyan-300 mt-1 font-medium">Gráficos y Distribución</div>
@@ -174,7 +174,7 @@
             </div>
         </div>
 
-        <!-- VISTA 3: BALANCE DE PAGOS -->
+        <!-- VISTA 3: BALANCE DE PAGOS CON DESGLOSE COMPLETO -->
         <div id="view-pagos" class="tab-view hidden space-y-8">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
                 
@@ -271,6 +271,10 @@
         let chartStudents = null;
         let isFirstLoad = true;
 
+        if (typeof ChartDataLabels !== 'undefined') {
+            Chart.register(ChartDataLabels);
+        }
+
         function switchTab(targetId) {
             document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
             document.getElementById(targetId).classList.remove('hidden');
@@ -278,7 +282,7 @@
             document.querySelectorAll('.nav-card').forEach(btn => {
                 btn.className = "nav-card premium-card text-left rounded-2xl p-5 hover:bg-slate-900/60 hover:border-slate-800/50";
             });
-            document.getElementById('btn-' + targetId).className = "nav-card premium-card text-left rounded-2xl p-5 border-cyan-500/40 bg-cyan-950/90 ring-1 ring-cyan-500/20 shadow-lg shadow-cyan-500/5";
+            document.getElementById('btn-' + targetId).className = "nav-card premium-card text-left rounded-2xl p-5 border-cyan-500/40 bg-indigo-950/90 ring-1 ring-cyan-500/20 shadow-lg shadow-cyan-500/5";
         }
 
         function getVal(cell, isNum = false) {
@@ -396,7 +400,6 @@
                     });
                 }
 
-                // LLAMADAS INDEPENDIENTES CON PROTECCIÓN EXTREMA (BLINDAJE DE ERRORES)
                 try { renderTable(tutorsData); } catch(e) { console.error(e); }
                 try { renderPagosLists(tutorsData); } catch(e) { console.error(e); }
                 try { renderCharts(tutorsData, efGlobal, yGlobal, matrGlobal, metaAlGlobal, pagGlobal); } catch(e) { console.error(e); }
@@ -490,7 +493,7 @@
 
             data.forEach(row => {
                 const itemEf = document.createElement('div');
-                itemEf.className = "bg-slate-950/40 p-3 rounded-xl border border-slate-800 flex justify-between items-center hover:bg-slate-900/40 transition-colors mb-2";
+                itemEf.className = "bg-slate-950/60 p-3 rounded-xl border border-slate-850 flex justify-between items-center hover:bg-slate-900/40 transition-colors mb-2";
                 itemEf.innerHTML = `
                     <div class="truncate pr-2">
                         <p class="text-[11px] font-bold text-slate-200 truncate">${row.tutor}</p>
@@ -510,7 +513,7 @@
                 listEfYape.appendChild(itemEf);
 
                 const itemPag = document.createElement('div');
-                itemPag.className = "bg-slate-950/40 p-3 rounded-xl border border-slate-800 flex justify-between items-center hover:bg-slate-900/40 transition-colors mb-2";
+                itemPag.className = "bg-slate-950/60 p-3 rounded-xl border border-slate-850 flex justify-between items-center hover:bg-slate-900/40 transition-colors mb-2";
                 
                 let faltaText = row.falta < 0 ? 'Sobran' : 'Faltan';
                 let faltaColor = row.falta < 0 ? 'text-emerald-400' : 'text-rose-400';
@@ -576,21 +579,20 @@
                             data: [efectivoGlobal, yapeGlobal],
                             backgroundColor: ['#22d3ee', '#6366f1'],
                             borderColor: '#0f172a', borderWidth: 3
-                        }]
-                    },
-                    options: {
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: { legend: { display: false }, datalabels: { display: false } },
-                        cutout: '75%'
-                    }
-                });
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, datalabels: { display: false } },
+                    cutout: '75%'
+                }
+            });
             } catch(e) { console.error(e); }
 
             try {
                 const ctxStudents = document.getElementById('chartStudents').getContext('2d');
                 if (chartStudents) { chartStudents.destroy(); }
                 
-                // Verificación y desactivación preventiva si el plugin lanza error CORS
                 let pluginArray = [];
                 let optionsDataLabels = { display: false };
                 
@@ -629,8 +631,14 @@
             } catch(e) { console.error(e); }
         }
 
-        loadDashboardData();
-        setInterval(loadDashboardData, 60000);
+        function checkInit() {
+            if(window.Chart) {
+                loadDashboardData();
+            } else {
+                setTimeout(checkInit, 50);
+            }
+        }
+        checkInit();
     </script>
 </body>
-</html>
+</html> 

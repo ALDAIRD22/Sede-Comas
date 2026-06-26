@@ -65,7 +65,7 @@
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 uppercase tracking-wider">Conectado en Vivo</span>
+                <span class="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20 uppercase tracking-wider">Conectado en Vivo</span>
             </div>
         </div>
     </header>
@@ -103,7 +103,7 @@
             </button>
         </nav>
 
-        <!-- TARJETAS DE INDICADORES GLOBALES -->
+        <!-- TARJETAS DE INDICADORES GLOBALES (CORREGIDO A DOS DECIMALES) -->
         <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             <div class="premium-card rounded-2xl p-5 flex flex-col justify-between shadow-xl relative overflow-hidden">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">💰 Total recaudado</p>
@@ -150,7 +150,7 @@
             </div>
         </div>
 
-        <!-- VISTA 2: CLASIFICACIÓN (RANKING MODIFICADO) -->
+        <!-- VISTA 2: CLASIFICACIÓN -->
         <div id="view-clasificacion" class="tab-view hidden space-y-6">
             <div class="premium-card rounded-2xl p-6 shadow-xl max-w-2xl mx-auto">
                 <div class="mb-5 border-b border-slate-800/80 pb-3">
@@ -276,7 +276,8 @@
                 let totalsIndex = rows.findIndex(r => r && r.c && r.c[0] && getVal(r.c[0]).trim().toUpperCase() === 'TOTALES');
                 if (totalsIndex === -1) totalsIndex = rows.length - 2;
 
-                const tRow = rows[totalsIndex + 1] || rows[totalsIndex];
+                // Fila de los montos totales unificada
+                const tRow = rows[totalsIndex];
                 let efGlobal = 0, yGlobal = 0, matrGlobal = 0, metaAlGlobal = 0, pagGlobal = 0;
                 let avanceGlobalNum = 0;
 
@@ -287,9 +288,10 @@
                     efGlobal = getVal(tRow.c[6], true);
                     yGlobal = getVal(tRow.c[7], true);
 
-                    document.getElementById('txt-meta-global').innerText = `Meta Total: S/ ${getVal(tRow.c[5], true).toLocaleString('es-PE')}`;
-                    document.getElementById('txt-recaudado-global').innerText = `S/ ${getVal(tRow.c[8], true).toLocaleString('es-PE')}`;
-                    document.getElementById('txt-falta-global').innerText = `S/ ${getVal(tRow.c[9], true).toLocaleString('es-PE')}`;
+                    // AHORA SE LE AGREGA FORMATO DE DOS DECIMALES FIJOS (.00) A TODAS LAS TARJETAS SUPERIORES
+                    document.getElementById('txt-meta-global').innerText = `Meta Total: S/ ${getVal(tRow.c[5], true).toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    document.getElementById('txt-recaudado-global').innerText = `S/ ${getVal(tRow.c[8], true).toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    document.getElementById('txt-falta-global').innerText = `S/ ${getVal(tRow.c[9], true).toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
                     
                     let avanceStr = getVal(tRow.c[10]);
                     if (avanceStr.includes('%')) {
@@ -302,9 +304,10 @@
                     document.getElementById('txt-avance-global').innerText = avanceGlobalNum + '%';
                     document.getElementById('bar-avance-global').style.width = avanceGlobalNum + '%';
 
-                    document.getElementById('box-efectivo-total').innerText = `S/ ${efGlobal.toLocaleString('es-PE', {minimumFractionDigits:0})}`;
-                    document.getElementById('box-yape-total').innerText = `S/ ${yGlobal.toLocaleString('es-PE', {minimumFractionDigits:0})}`;
-                    document.getElementById('box-recaudado-total').innerText = `S/ ${getVal(tRow.c[8], true).toLocaleString('es-PE', {minimumFractionDigits:0})}`;
+                    // Formato de dos decimales fijos a las vistas internas de Balances
+                    document.getElementById('box-efectivo-total').innerText = `S/ ${efGlobal.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    document.getElementById('box-yape-total').innerText = `S/ ${yGlobal.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                    document.getElementById('box-recaudado-total').innerText = `S/ ${getVal(tRow.c[8], true).toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 
                     document.getElementById('box-meta-alumnos').innerText = metaAlGlobal;
                     document.getElementById('box-pagantes-actuales').innerText = pagGlobal;
@@ -392,11 +395,11 @@
                     <td class="py-3 px-2 text-center text-slate-300 font-semibold">${row.matriculados}</td>
                     <td class="py-3 px-2 text-center text-orange-400 font-bold">${row.metaEst}</td>
                     <td class="py-3 px-2 text-center text-sky-400 font-bold">${row.pagantes}</td>
-                    <td class="py-3 px-2 text-right text-amber-400 font-bold whitespace-nowrap">S/ ${row.metaDinero.toLocaleString('es-PE', {maximumFractionDigits:0})}</td>
-                    <td class="py-3 px-2 text-right text-teal-400 font-medium whitespace-nowrap">S/ ${row.efectivo.toLocaleString('es-PE', {maximumFractionDigits:0})}</td>
-                    <td class="py-3 px-2 text-right text-violet-400 font-medium whitespace-nowrap">S/ ${row.yape.toLocaleString('es-PE', {maximumFractionDigits:0})}</td>
-                    <td class="py-3 px-2 text-right font-black text-emerald-400 whitespace-nowrap">S/ ${row.recaudado.toLocaleString('es-PE', {maximumFractionDigits:0})}</td>
-                    <td class="py-3 px-2 text-right font-bold whitespace-nowrap ${row.falta < 0 ? 'text-emerald-400' : 'text-rose-400'}">S/ ${row.falta.toLocaleString('es-PE', {maximumFractionDigits:0})}</td>
+                    <td class="py-3 px-2 text-right text-amber-400 font-bold whitespace-nowrap">S/ ${row.metaDinero.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td class="py-3 px-2 text-right text-teal-400 font-medium whitespace-nowrap">S/ ${row.efectivo.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td class="py-3 px-2 text-right text-violet-400 font-medium whitespace-nowrap">S/ ${row.yape.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td class="py-3 px-2 text-right font-black text-emerald-400 whitespace-nowrap">S/ ${row.recaudado.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                    <td class="py-3 px-2 text-right font-bold whitespace-nowrap ${row.falta < 0 ? 'text-emerald-400' : 'text-rose-400'}">S/ ${row.falta.toLocaleString('es-PE', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
                     <td class="py-3 px-3 text-center">
                         <span class="px-1.5 py-0.5 rounded text-[10px] font-extrabold ${row.avance >= 100 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-indigo-500/10 text-indigo-400'}">${row.avance}%</span>
                     </td>
@@ -405,7 +408,6 @@
             });
         }
 
-        // MODIFICACIÓN EN EL RENDERIZADO DEL RANKING PARA MOSTRAR CANTIDAD DE PAGANTES
         function renderLeaderboard(data) {
             const container = document.getElementById('leaderboard-container');
             container.innerHTML = '';
@@ -432,7 +434,6 @@
                     </div>
                     <div class="text-right ml-2 flex-shrink-0">
                         <p class="text-sm font-bold text-white">${row.avance}%</p>
-                        <!-- CORREGIDO: AHORA MUESTRA LA CANTIDAD REAL DE ALUMNOS PAGANTES EN VEZ DE LA MONEDA -->
                         <p class="text-[11px] text-sky-400 font-bold">${row.pagantes} pagantes</p>
                     </div>
                 `;

@@ -103,7 +103,7 @@
             </div>
         </section>
 
-        <!-- VISTA 1: RESUMEN -->
+        <!-- VISTA 1: RESUMEN (GRÁFICOS AMPLIADOS) -->
         <div id="view-resumen" class="tab-view space-y-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 premium-card rounded-2xl p-6 shadow-xl">
@@ -118,6 +118,12 @@
                         <div><span class="inline-block w-2 h-2 rounded-full bg-violet-500 mr-1.5"></span>Yape</div>
                     </div>
                 </div>
+            </div>
+            
+            <!-- NUEVO GRÁFICO DE BARRAS PARA CONTROL DE ALUMNOS -->
+            <div class="premium-card rounded-2xl p-6 shadow-xl">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-400 mb-5">Control General de Alumnos (Matriculados vs Meta vs Pagantes)</h3>
+                <div class="relative h-72"><canvas id="chartStudents"></canvas></div>
             </div>
         </div>
 
@@ -171,7 +177,7 @@
             </div>
         </div>
 
-        <!-- VISTA 4: TABLA DE TUTORES CON ENCABEZADO OSCURO SÓLIDO -->
+        <!-- VISTA 4: TABLA DE TUTORES -->
         <div id="view-tutores" class="tab-view hidden space-y-6">
             <section class="premium-card rounded-2xl overflow-hidden shadow-2xl">
                 <div class="p-5 border-b border-slate-800/80 bg-slate-950/20">
@@ -180,7 +186,6 @@
                 <div class="w-full overflow-x-auto lg:overflow-x-hidden">
                     <table class="w-full text-left border-collapse text-[11px] sm:text-xs">
                         <thead>
-                            <!-- MODIFICADO: bg-slate-950 SÓLIDO Y OSCURO PARA EL CUADRADO DEL ENCABEZADO -->
                             <tr class="bg-slate-950 text-slate-400 font-bold uppercase tracking-wider border-b border-slate-800 text-[10px]">
                                 <th class="py-3.5 px-3">Tutor</th>
                                 <th class="py-3.5 px-2">Ciclo</th>
@@ -207,6 +212,7 @@
 
         let chartBar = null;
         let chartPie = null;
+        let chartStudents = null;
 
         function switchTab(targetId) {
             document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
@@ -247,9 +253,12 @@
                 if (totalsIndex === -1) totalsIndex = rows.length - 2;
 
                 const tRow = rows[totalsIndex + 1] || rows[totalsIndex];
-                let efGlobal = 0, yGlobal = 0;
+                let efGlobal = 0, yGlobal = 0, matrGlobal = 0, metaAlGlobal = 0, pagGlobal = 0;
 
                 if(tRow && tRow.c) {
+                    matrGlobal = getVal(tRow.c[2], true);
+                    metaAlGlobal = getVal(tRow.c[3], true);
+                    pagGlobal = getVal(tRow.c[4], true);
                     efGlobal = getVal(tRow.c[6], true);
                     yGlobal = getVal(tRow.c[7], true);
 
@@ -263,6 +272,15 @@
                     
                     document.getElementById('txt-avance-global').innerText = avanceGlobalNum + '%';
                     document.getElementById('bar-avance-global').style.width = avanceGlobalNum + '%';
+
+                    document.getElementById('box-efectivo-total').innerText = `S/ ${efGlobal.toLocaleString('es-PE', {minimumFractionDigits:0})}`;
+                    document.getElementById('box-yape-total').innerText = `S/ ${yGlobal.toLocaleString('es-PE', {minimumFractionDigits:0})}`;
+                    document.getElementById('box-recaudado-total').innerText = `S/ ${getVal(tRow.c[8], true).toLocaleString('es-PE', {minimumFractionDigits:0})}`;
+
+                    document.getElementById('box-meta-alumnos').innerText = metaAlGlobal;
+                    document.getElementById('box-pagantes-actuales').innerText = pagGlobal;
+                    document.getElementById('box-pagantes-falta').innerText = (metaAlGlobal - Math.floor(pagGlobal));
+
                     document.getElementById('error-box').className = 'hidden';
                 }
 
@@ -281,19 +299,20 @@
                     tutorsData.push({
                         tutor: tutorName,
                         ciclo: getVal(row.c[1]).trim(),
-                        metaEst: getVal(row.c[2], true),
-                        pagantes: getVal(row.c[3], true),
-                        metaDinero: getVal(row.c[4], true),
-                        efectivo: getVal(row.c[5], true),
-                        yape: getVal(row.c[6], true),
-                        recaudado: getVal(row.c[7], true),
-                        falta: getVal(row.c[8], true),
+                        matriculados: getVal(row.c[2], true),
+                        metaEst: getVal(row.c[3], true),
+                        pagantes: getVal(row.c[4], true),
+                        metaDinero: getVal(row.c[5], true),
+                        efectivo: getVal(row.c[6], true),
+                        yape: getVal(row.c[7], true),
+                        recaudado: getVal(row.c[8], true),
+                        falta: getVal(row.c[9], true),
                         avance: avanceNum
                     });
                 }
 
                 renderTable(tutorsData);
-                renderChart(tutorsData);
+                renderCharts(tutorsData, efGlobal, yGlobal, matrGlobal, metaAlGlobal, pagGlobal);
                 
                 const rankedData = [...tutorsData].sort((a, b) => b.avance - a.avance);
                 renderLeaderboard(rankedData);
@@ -309,7 +328,7 @@
             tbody.innerHTML = '';
             data.forEach(row => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-800/30 transition-colors border-b border-slate-800/40";
+                tr.className = "hover:bg-slate-800/30 transition-colors border-b border-slate-800/40 text-xs";
                 tr.innerHTML = `
                     <td class="py-3 px-3 font-bold text-slate-100 whitespace-nowrap">
                         <div class="flex items-center space-x-1">
@@ -367,7 +386,7 @@
             });
         }
 
-        function renderCharts(data, efectivoGlobal, yapeGlobal) {
+        function renderCharts(data, efectivoGlobal, yapeGlobal, matrGlobal, metaAlGlobal, pagGlobal) {
             const ctxBar = document.getElementById('chartTutors').getContext('2d');
             if (chartBar) { chartBar.destroy(); }
             chartBar = new Chart(ctxBar, {
@@ -405,6 +424,30 @@
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     cutout: '75%'
+                }
+            });
+
+            // NUEVA CONFIGURACIÓN: GRÁFICA VERTICAL COMPARTIDA DE ALUMNOS GLOBALES
+            const ctxStudents = document.getElementById('chartStudents').getContext('2d');
+            if (chartStudents) { chartStudents.destroy(); }
+            chartStudents = new Chart(ctxStudents, {
+                type: 'bar',
+                data: {
+                    labels: ['Matriculados', 'Meta Alumnos', 'Pagantes Actuales'],
+                    datasets: [{
+                        data: [matrGlobal, metaAlGlobal, pagGlobal],
+                        backgroundColor: ['#6366f1', '#f97316', '#38bdf8'],
+                        borderRadius: 6,
+                        barThickness: 35
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', weight: '600' } }, grid: { display: false } },
+                        y: { grid: { color: 'rgba(51, 65, 85, 0.2)' }, ticks: { color: '#94a3b8' } }
+                    }
                 }
             });
         }
